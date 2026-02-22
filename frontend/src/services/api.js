@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.REACT_APP_API_URL,
+  withCredentials: true,
 });
 
 // Attach token to every request

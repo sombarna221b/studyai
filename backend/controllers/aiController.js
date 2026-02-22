@@ -11,6 +11,7 @@ const getGemini = () => {
 
 // Truncate text to avoid token limits
 const truncateText = (text, maxChars = 15000) => {
+  if (!text) return '';
   if (text.length <= maxChars) return text;
   return text.substring(0, maxChars) + '... [text truncated]';
 };
@@ -194,6 +195,7 @@ const explainConcept = async (req, res) => {
   }
 };
 
+
 // @desc   AI Chat with document context
 // @route  POST /api/ai/chat/:documentId
 // @access Private
@@ -214,6 +216,11 @@ const chatWithDocument = async (req, res) => {
       return res.status(404).json({ message: 'Document not found' });
     }
 
+    // ✅ ADD THIS SAFETY CHECK
+    if (!document.extractedText) {
+      return res.status(400).json({ message: 'Document has no extractable text' });
+    }
+
     // Get or create chat history
     let chatHistory = await ChatHistory.findOne({
       user: req.user._id,
@@ -231,7 +238,7 @@ const chatWithDocument = async (req, res) => {
     const model = getGemini();
 
     // Build conversation context
-    const recentMessages = chatHistory.messages.slice(-10); // last 10 messages
+    const recentMessages = chatHistory.messages.slice(-10);
     const history = recentMessages
       .map((m) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
       .join('\n');
