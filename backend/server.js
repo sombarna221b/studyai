@@ -12,8 +12,25 @@ connectDB();
 const app = express();
 
 // Middleware
+// app.use(cors({
+//   origin: true,
+//   credentials: true
+// }));
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://studyai-eta.vercel.app"
+];
+
 app.use(cors({
-  origin: true,
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true); // allow Postman etc.
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
