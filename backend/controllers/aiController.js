@@ -201,69 +201,85 @@ const explainConcept = async (req, res) => {
 // @access Private
 const chatWithDocument = async (req, res) => {
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
     const { message } = req.body;
+    const documentId = req.params.documentId;
 
     if (!message) {
-      return res.status(400).json({ message: 'Message is required' });
+      return res.status(400).json({ message: "Message is required" });
+    }
+
+    if (!documentId) {
+      return res.status(400).json({ message: "Document ID missing" });
     }
 
     const document = await Document.findOne({
-      _id: req.params.documentId,
+      _id: documentId,
       user: req.user._id,
     });
 
     if (!document) {
-      return res.status(404).json({ message: 'Document not found' });
+      return res.status(404).json({ message: "Document not found" });
     }
 
-    // ✅ ADD THIS SAFETY CHECK
-    if (!document.extractedText) {
-      return res.status(400).json({ message: 'Document has no extractable text' });
-    }
+    const textContent = document.extractedText || "";
 
-    // Get or create chat history
     let chatHistory = await ChatHistory.findOne({
       user: req.user._id,
-      document: req.params.documentId,
+      document: documentId,
     });
 
     if (!chatHistory) {
       chatHistory = await ChatHistory.create({
         user: req.user._id,
-        document: req.params.documentId,
+        document: documentId,
         messages: [],
       });
     }
 
     const model = getGemini();
 
-    // Build conversation context
     const recentMessages = chatHistory.messages.slice(-10);
     const history = recentMessages
-      .map((m) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
-      .join('\n');
+      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
+      .join("\n");
 
-    const prompt = `You are an AI learning assistant. Answer questions based on the provided document.
-    Be helpful, accurate, and educational.
-    
-    Document: "${document.title}"
-    Content: ${truncateText(document.extractedText, 8000)}
-    
-    ${history ? `Conversation history:\n${history}\n` : ''}
-    User: ${message}
-    Assistant:`;
+    const prompt = `
+You are an AI learning assistant. Answer questions based on the provided document.
 
-    const result = await model.generateContent(prompt);
+Document: "${document.title || "Untitled"}"
+Content: ${textContent.substring(0, 8000)}
+
+${history ? `Conversation history:\n${history}\n` : ""}
+User: ${message}
+Assistant:
+`;
+
+    let result;
+    try {
+      result = await model.generateContent(prompt);
+    } catch (aiError) {
+      console.error("Gemini Error:", aiError);
+      return res.status(500).json({
+        message: "AI model response failed"
+      });
+    }
+
     const aiResponse = result.response.text();
 
-    // Save messages
-    chatHistory.messages.push({ role: 'user', content: message });
-    chatHistory.messages.push({ role: 'assistant', content: aiResponse });
+    chatHistory.messages.push({ role: "user", content: message });
+    chatHistory.messages.push({ role: "assistant", content: aiResponse });
+
     await chatHistory.save();
 
     res.json({ response: aiResponse });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Chat Controller Error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
