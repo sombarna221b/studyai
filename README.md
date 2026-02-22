@@ -3,8 +3,8 @@
 An AI-powered learning platform that transforms PDF documents into interactive study materials — flashcards, quizzes, summaries and contextual chat — built with the MERN stack and Google Gemini AI.
 
 ## Live Demo
-🔗 **[studyai.vercel.app](https://studyai.vercel.app)** *(replace with your actual URL after deployment)*
-
+🌐 Frontend: https://your-vercel-url.vercel.app  
+🚀 Backend API: https://your-render-url.onrender.com
 ---
 
 ## What it does
@@ -69,7 +69,6 @@ studyai/
 ```bash
 cd backend
 npm install
-# Create .env with your credentials (see backend/README.md)
 npm run dev
 ```
 
@@ -77,7 +76,6 @@ npm run dev
 ```bash
 cd frontend
 npm install
-# Create .env with REACT_APP_API_URL=http://localhost:5000/api
 npm start
 ```
 
@@ -97,7 +95,7 @@ npm start
 
 ## Screenshots
 
-
+![alt text](StudyAI.png)
 
 ---
 

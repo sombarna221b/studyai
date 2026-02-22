@@ -121,4 +121,29 @@ npm run build
 
 ## Deployment
 
-Deployed on **Vercel**. Set the `REACT_APP_API_URL` environment variable in Vercel dashboard to point to your Render backend URL.
+The frontend is deployed on Vercel with:
+
+- Automatic deployment from GitHub
+- Environment-based API configuration
+- Production build optimization
+- Connected to Render-hosted backend
+
+Environment variables are securely configured in the Vercel dashboard.
+
+## Architecture Overview
+
+- React 18 with functional components and hooks
+- Context API for global state management (Auth + Theme)
+- Axios service layer for centralized API communication
+- JWT stored securely and attached via interceptors
+- Protected routes using custom auth guards
+- Responsive layout with reusable layout components
+- Integrated with production backend deployed on Render
+
+## UX & Performance Features
+
+- Persistent theme preference (localStorage)
+- Optimized API calls with centralized Axios instance
+- Loading states and toast notifications
+- Cold-start handling for Render backend
+- Responsive design across desktop and mobile

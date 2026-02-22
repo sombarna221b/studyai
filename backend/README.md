@@ -109,4 +109,34 @@ npm start
 
 ## Deployment
 
-Deployed on **Render** with the following environment variables configured in the Render dashboard.
+The backend is deployed on Render in production mode with environment variables securely configured via the Render dashboard.
+
+- Auto-deploy enabled from GitHub
+- Production CORS configuration
+- MongoDB Atlas cloud connection
+
+## Live API
+
+Base URL:
+https://your-backend-name.onrender.com
+
+Health Check:
+https://your-backend-name.onrender.com/api/health
+
+## Architecture Overview
+
+- RESTful API architecture
+- JWT authentication with protected routes
+- Modular MVC pattern (Routes → Controllers → Models)
+- Cloudinary for scalable media storage
+- MongoDB Atlas for cloud database
+- Deployed backend on Render (production environment)
+- CORS configured for Vercel frontend integration
+
+## Security Features
+
+- Password hashing using bcryptjs
+- JWT authentication with protected middleware
+- Environment variable management
+- CORS production configuration
+- Input validation and centralized error handling
